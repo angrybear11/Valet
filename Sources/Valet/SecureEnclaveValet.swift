@@ -30,13 +30,13 @@ public final class SecureEnclaveValet: NSObject {
     
     /// - parameter identifier: A non-empty string that uniquely identifies a SecureEnclaveValet.
     /// - returns: A SecureEnclaveValet that reads/writes keychain elements with the desired flavor.
-    public class func valet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl) -> SecureEnclaveValet {
-        let key = Service.standard(identifier, .secureEnclave(accessControl)).description as NSString
+    public class func valet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility = Accessibility.whenPasscodeSetThisDeviceOnly) -> SecureEnclaveValet {
+        let key = Service.standard(identifier, .secureEnclave(accessControl, accessibility)).description as NSString
         if let existingValet = identifierToValetMap.object(forKey: key) {
             return existingValet
             
         } else {
-            let valet = SecureEnclaveValet(identifier: identifier, accessControl: accessControl)
+            let valet = SecureEnclaveValet(identifier: identifier, accessControl: accessControl, accessibility: accessibility)
             identifierToValetMap.setObject(valet, forKey: key)
             return valet
         }
@@ -44,13 +44,13 @@ public final class SecureEnclaveValet: NSObject {
     
     /// - parameter identifier: A non-empty string that must correspond with the value for keychain-access-groups in your Entitlements file.
     /// - returns: A SecureEnclaveValet that reads/writes keychain elements that can be shared across applications written by the same development team.
-    public class func sharedAccessGroupValet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl) -> SecureEnclaveValet {
-        let key = Service.sharedAccessGroup(identifier, .secureEnclave(accessControl)).description as NSString
+    public class func sharedAccessGroupValet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility = Accessibility.whenPasscodeSetThisDeviceOnly) -> SecureEnclaveValet {
+        let key = Service.sharedAccessGroup(identifier, .secureEnclave(accessControl, accessibility)).description as NSString
         if let existingValet = identifierToValetMap.object(forKey: key) {
             return existingValet
             
         } else {
-            let valet = SecureEnclaveValet(sharedAccess: identifier, accessControl: accessControl)
+            let valet = SecureEnclaveValet(sharedAccess: identifier, accessControl: accessControl, accessibility: accessibility)
             identifierToValetMap.setObject(valet, forKey: key)
             return valet
         }
@@ -73,16 +73,16 @@ public final class SecureEnclaveValet: NSObject {
     public override init() {
         fatalError("Use the class methods above to create usable SecureEnclaveValet objects")
     }
-    
-    private init(identifier: Identifier, accessControl: SecureEnclaveAccessControl) {
-        service = .standard(identifier, .secureEnclave(accessControl))
+
+    private init(identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility) {
+        service = .standard(identifier, .secureEnclave(accessControl, accessibility))
         keychainQuery = service.generateBaseQuery()
         self.identifier = identifier
         self.accessControl = accessControl
     }
-    
-    private init(sharedAccess identifier: Identifier, accessControl: SecureEnclaveAccessControl) {
-        service = .sharedAccessGroup(identifier, .secureEnclave(accessControl))
+
+    private init(sharedAccess identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility) {
+        service = .sharedAccessGroup(identifier, .secureEnclave(accessControl, accessibility))
         keychainQuery = service.generateBaseQuery()
         self.identifier = identifier
         self.accessControl = accessControl

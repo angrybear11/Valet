@@ -33,13 +33,13 @@ public final class SinglePromptSecureEnclaveValet: NSObject {
     
     /// - parameter identifier: A non-empty string that uniquely identifies a SinglePromptSecureEnclaveValet.
     /// - returns: A SinglePromptSecureEnclaveValet that reads/writes keychain elements with the desired flavor.
-    public class func valet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl) -> SinglePromptSecureEnclaveValet {
-        let key = Service.standard(identifier, .singlePromptSecureEnclave(accessControl)).description as NSString
+    public class func valet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility = Accessibility.whenPasscodeSetThisDeviceOnly) -> SinglePromptSecureEnclaveValet {
+        let key = Service.standard(identifier, .singlePromptSecureEnclave(accessControl, accessibility)).description as NSString
         if let existingValet = identifierToValetMap.object(forKey: key) {
             return existingValet
             
         } else {
-            let valet = SinglePromptSecureEnclaveValet(identifier: identifier, accessControl: accessControl)
+            let valet = SinglePromptSecureEnclaveValet(identifier: identifier, accessControl: accessControl, accessibility: accessibility)
             identifierToValetMap.setObject(valet, forKey: key)
             return valet
         }
@@ -47,13 +47,13 @@ public final class SinglePromptSecureEnclaveValet: NSObject {
     
     /// - parameter identifier: A non-empty string that must correspond with the value for keychain-access-groups in your Entitlements file.
     /// - returns: A SinglePromptSecureEnclaveValet that reads/writes keychain elements that can be shared across applications written by the same development team.
-    public class func sharedAccessGroupValet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl) -> SinglePromptSecureEnclaveValet {
-        let key = Service.sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl)).description as NSString
+    public class func sharedAccessGroupValet(with identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility = Accessibility.whenPasscodeSetThisDeviceOnly) -> SinglePromptSecureEnclaveValet {
+        let key = Service.sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl, accessibility)).description as NSString
         if let existingValet = identifierToValetMap.object(forKey: key) {
             return existingValet
             
         } else {
-            let valet = SinglePromptSecureEnclaveValet(sharedAccess: identifier, accessControl: accessControl)
+            let valet = SinglePromptSecureEnclaveValet(sharedAccess: identifier, accessControl: accessControl, accessibility: accessibility)
             identifierToValetMap.setObject(valet, forKey: key)
             return valet
         }
@@ -76,16 +76,16 @@ public final class SinglePromptSecureEnclaveValet: NSObject {
     public override init() {
         fatalError("Use the class methods above to create usable SinglePromptSecureEnclaveValet objects")
     }
-    
-    private init(identifier: Identifier, accessControl: SecureEnclaveAccessControl) {
-        service = .standard(identifier, .singlePromptSecureEnclave(accessControl))
+
+    private init(identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility) {
+        service = .standard(identifier, .singlePromptSecureEnclave(accessControl, accessibility))
         baseKeychainQuery = service.generateBaseQuery()
         self.identifier = identifier
         self.accessControl = accessControl
     }
-    
-    private init(sharedAccess identifier: Identifier, accessControl: SecureEnclaveAccessControl) {
-        service = .sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl))
+
+    private init(sharedAccess identifier: Identifier, accessControl: SecureEnclaveAccessControl, accessibility: Accessibility) {
+        service = .sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl, accessibility))
         baseKeychainQuery = service.generateBaseQuery()
         self.identifier = identifier
         self.accessControl = accessControl

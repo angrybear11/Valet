@@ -45,7 +45,7 @@ class SecureEnclaveTests: XCTestCase
 
         SecureEnclaveAccessControl.allValues().forEach { accessControl in
             let backingService = SecureEnclaveValet.valet(with: identifier, accessControl: accessControl).service
-            XCTAssertEqual(backingService, Service.standard(identifier, .secureEnclave(accessControl)))
+            XCTAssertEqual(backingService, Service.standard(identifier, .secureEnclave(accessControl, .whenPasscodeSetThisDeviceOnly)))
         }
     }
 
@@ -54,7 +54,7 @@ class SecureEnclaveTests: XCTestCase
 
         SecureEnclaveAccessControl.allValues().forEach { accessControl in
             let backingService = SecureEnclaveValet.sharedAccessGroupValet(with: identifier, accessControl: accessControl).service
-            XCTAssertEqual(backingService, Service.sharedAccessGroup(identifier, .secureEnclave(accessControl)))
+            XCTAssertEqual(backingService, Service.sharedAccessGroup(identifier, .secureEnclave(accessControl, .whenPasscodeSetThisDeviceOnly)))
         }
     }
 

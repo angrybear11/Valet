@@ -46,7 +46,7 @@ class SinglePromptSecureEnclaveTests: XCTestCase
 
         SecureEnclaveAccessControl.allValues().forEach { accessControl in
             let backingService = SinglePromptSecureEnclaveValet.valet(with: identifier, accessControl: accessControl).service
-            XCTAssertEqual(backingService, Service.standard(identifier, .singlePromptSecureEnclave(accessControl)))
+            XCTAssertEqual(backingService, Service.standard(identifier, .singlePromptSecureEnclave(accessControl, .whenPasscodeSetThisDeviceOnly)))
         }
     }
 
@@ -55,7 +55,7 @@ class SinglePromptSecureEnclaveTests: XCTestCase
 
         SecureEnclaveAccessControl.allValues().forEach { accessControl in
             let backingService = SinglePromptSecureEnclaveValet.sharedAccessGroupValet(with: identifier, accessControl: accessControl).service
-            XCTAssertEqual(backingService, Service.sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl)))
+            XCTAssertEqual(backingService, Service.sharedAccessGroup(identifier, .singlePromptSecureEnclave(accessControl, .whenPasscodeSetThisDeviceOnly)))
         }
     }
 
